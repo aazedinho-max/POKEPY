@@ -26,9 +26,9 @@
 
     <script>
         // CONFIGURAÇÃO: Substitua pelos seus dados reais
-        const SPREADSHEET_ID = 'SEU_ID_DA_PLANILHA'; 
-        const API_KEY = 'SUA_API_KEY_DO_GOOGLE_CLOUD';
-        const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Dados!A2:E2?key=${API_KEY}`;
+        const SPREADSHEET_ID = '1gpkFIY0yWgqctfQkVd3g7LCBdVVmalpX8UQ3DnrZIbc'; 
+        const API_KEY = 'AIzaSyCzSCplXMo4zS9CKh9FmrmUyE0u_sCVqV0';
+        const URL = `https://script.google.com/macros/s/AKfycbxAEh9qbKPOQIsIq4bLgnbiUWJhQIjdYsHB1unBKH0ZuqH6dL--tKSPv56LBg6vGtVg/exec`;
 
         async function carregarDados() {
             const res = await fetch(URL);
