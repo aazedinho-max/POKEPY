@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>SheetGotchi</title>
+    <style>
+        body { background: #333; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: monospace; }
+        .device { width: 320px; background: #ffb7c5; border: 8px solid #ff8da1; border-radius: 30px; padding: 20px; text-align: center; }
+        .screen { background: #9bbc0f; border: 4px solid #0f380f; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .fill { height: 10px; background: #0f380f; transition: 0.3s; }
+        button { padding: 15px; font-size: 20px; border: none; background: #fff; border-radius: 50%; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="device">
+        <div class="screen">
+            <img id="pet" src="" width="80">
+            <div id="status" style="font-size: 12px; color: #0f380f; font-weight: bold;">Carregando...</div>
+        </div>
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 20px;">
+            <button onclick="enviarAcao('comer')">🍎</button>
+            <button onclick="enviarAcao('brincar')">🎮</button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO: Substitua pelos seus dados reais
+        const SPREADSHEET_ID = 'SEU_ID_DA_PLANILHA'; 
+        const API_KEY = 'SUA_API_KEY_DO_GOOGLE_CLOUD';
+        const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Dados!A2:E2?key=${API_KEY}`;
+
+        async function carregarDados() {
+            const res = await fetch(URL);
+            const data = await res.json();
+            const [status, fome, feliz, time, estagio] = data.values[0];
+            
+            document.getElementById('pet').src = (fome > 30) ? "URL_GIF_FELIZ" : "URL_GIF_TRISTE";
+            document.getElementById('status').innerText = `Fome: ${Math.floor(fome)} | Saúde: ${Math.floor(feliz)}`;
+        }
+
+        async function enviarAcao(tipo) {
+            // Aqui você chama seu script do Google como API
+            // Mantenha seu Código.gs apenas com a lógica de cálculo
+            await fetch(`SUA_URL_DO_WEB_APP_EXEC?comando=${tipo}`);
+            carregarDados();
+        }
+
+        carregarDados();
+        setInterval(carregarDados, 5000); // Atualiza o status automaticamente
+    </script>
+</body>
+</html>
