@@ -1,46 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title>SheetGotchi</title>
     <style>
-        body { background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .device { width: 300px; background: #ffb7c5; border-radius: 30px; padding: 20px; text-align: center; }
-        .screen { background: #9bbc0f; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; }
-        img { width: 80px; height: 80px; }
-        button { margin: 10px; padding: 10px; border-radius: 50%; border: none; cursor: pointer; }
+        body { background: #333; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: monospace; }
+        .device { width: 320px; background: #ffb7c5; border: 8px solid #ff8da1; border-radius: 30px; padding: 20px; text-align: center; }
+        .screen { background: #9bbc0f; border: 4px solid #0f380f; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; }
+        .status-text { font-size: 14px; color: #0f380f; font-weight: bold; margin-top: 10px; }
+        button { padding: 15px; font-size: 20px; border: none; background: #fff; border-radius: 50%; cursor: pointer; margin: 0 10px; }
+        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
     <div class="device">
         <div class="screen">
-            <img id="pet" src="">
-            <div id="status">Carregando...</div>
+            <img id="pet" src="" width="80" alt="Pet">
+            <div id="status" class="status-text">Conectando...</div>
         </div>
-        <button onclick="enviarAcao('comer')">🍎</button>
-        <button onclick="enviarAcao('brincar')">🎮</button>
+        <div style="margin-top: 15px; display: flex; justify-content: center;">
+            <button onclick="enviarAcao('comer')">🍎</button>
+            <button onclick="enviarAcao('brincar')">🎮</button>
+        </div>
     </div>
 
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyK4F24g5bta7JhUjreKaxS3HhglnT0SIaM_XyerMthbQwHF88EHSCDP7Ocy5kraA/exec';
+        // === COLOQUE A SUA URL AQUI ===
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCloedqt3iBUDq_SVpRG_nwvsDtKSred5MWNrDFUN4114Mz300Y6nYtQR6weBOP37x/exec';
 
-        async function carregarDados() {
-            try {
-                const res = await fetch(WEB_APP_URL + "?comando=get");
-                const s = await res.json();
-                document.getElementById('pet').src = s.sprite;
-                document.getElementById('status').innerText = `Fome: ${Math.floor(s.fome)} | Saúde: ${Math.floor(s.felicidade)}`;
-            } catch (e) { document.getElementById('status').innerText = "Erro na conexão"; }
+        function buscarDados(comando = 'get') {
+            // Método JSONP: Injeta um script dinâmico para evitar bloqueio de segurança
+            const script = document.createElement('script');
+            script.src = `${WEB_APP_URL}?comando=${comando}&callback=processarResposta`;
+            script.onload = () => script.remove(); // Limpa o HTML depois de carregar
+            document.body.appendChild(script);
         }
 
-        async function enviarAcao(tipo) {
-            document.getElementById('status').innerText = "Enviando...";
-            await fetch(WEB_APP_URL + "?comando=" + tipo);
-            carregarDados();
+        // Função chamada automaticamente pelo Google Apps Script
+        function processarResposta(data) {
+            if (data.status === "Morto") {
+                document.getElementById('status').innerText = "Game Over 💀";
+            } else {
+                document.getElementById('status').innerText = `Fome: ${Math.floor(data.fome)} | Feliz: ${Math.floor(data.felicidade)}`;
+            }
+            document.getElementById('pet').src = data.sprite;
         }
 
-        carregarDados();
+        function enviarAcao(tipo) {
+            document.getElementById('status').innerText = "Processando...";
+            buscarDados(tipo);
+        }
+
+        // Inicia buscando o estado atual do Pet
+        buscarDados();
+
+        // Atualiza a tela automaticamente a cada 15 segundos
+        setInterval(() => buscarDados('get'), 15000);
     </script>
 </body>
 </html>
