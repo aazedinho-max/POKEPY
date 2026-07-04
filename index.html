@@ -2,52 +2,45 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SheetGotchi</title>
     <style>
-        body { background: #333; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: monospace; }
-        .device { width: 320px; background: #ffb7c5; border: 8px solid #ff8da1; border-radius: 30px; padding: 20px; text-align: center; }
-        .screen { background: #9bbc0f; border: 4px solid #0f380f; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .fill { height: 10px; background: #0f380f; transition: 0.3s; }
-        button { padding: 15px; font-size: 20px; border: none; background: #fff; border-radius: 50%; cursor: pointer; }
+        body { background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .device { width: 300px; background: #ffb7c5; border-radius: 30px; padding: 20px; text-align: center; }
+        .screen { background: #9bbc0f; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; }
+        img { width: 80px; height: 80px; }
+        button { margin: 10px; padding: 10px; border-radius: 50%; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="device">
         <div class="screen">
-            <img id="pet" src="" width="80">
-            <div id="status" style="font-size: 12px; color: #0f380f; font-weight: bold;">Carregando...</div>
+            <img id="pet" src="">
+            <div id="status">Carregando...</div>
         </div>
-        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 20px;">
-            <button onclick="enviarAcao('comer')">🍎</button>
-            <button onclick="enviarAcao('brincar')">🎮</button>
-        </div>
+        <button onclick="enviarAcao('comer')">🍎</button>
+        <button onclick="enviarAcao('brincar')">🎮</button>
     </div>
 
     <script>
-        // CONFIGURAÇÃO: Substitua pelos seus dados reais
-        const SPREADSHEET_ID = '1gpkFIY0yWgqctfQkVd3g7LCBdVVmalpX8UQ3DnrZIbc'; 
-        const API_KEY = 'AIzaSyCzSCplXMo4zS9CKh9FmrmUyE0u_sCVqV0';
-        const URL = `https://script.google.com/macros/s/AKfycby0LG7Ii34XG9z_W4krLaZGw95wyS-HlL0FlYNkFTOPw8HNILOY2so0fyO1TRFDddje/exec`;
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyK4F24g5bta7JhUjreKaxS3HhglnT0SIaM_XyerMthbQwHF88EHSCDP7Ocy5kraA/exec';
 
         async function carregarDados() {
-            const res = await fetch(URL);
-            const data = await res.json();
-            const [status, fome, feliz, time, estagio] = data.values[0];
-            
-            document.getElementById('pet').src = (fome > 30) ? "URL_GIF_FELIZ" : "URL_GIF_TRISTE";
-            document.getElementById('status').innerText = `Fome: ${Math.floor(fome)} | Saúde: ${Math.floor(feliz)}`;
+            try {
+                const res = await fetch(WEB_APP_URL + "?comando=get");
+                const s = await res.json();
+                document.getElementById('pet').src = s.sprite;
+                document.getElementById('status').innerText = `Fome: ${Math.floor(s.fome)} | Saúde: ${Math.floor(s.felicidade)}`;
+            } catch (e) { document.getElementById('status').innerText = "Erro na conexão"; }
         }
 
         async function enviarAcao(tipo) {
-            // Aqui você chama seu script do Google como API
-            // Mantenha seu Código.gs apenas com a lógica de cálculo
-            await fetch(`SUA_URL_DO_WEB_APP_EXEC?comando=${tipo}`);
+            document.getElementById('status').innerText = "Enviando...";
+            await fetch(WEB_APP_URL + "?comando=" + tipo);
             carregarDados();
         }
 
         carregarDados();
-        setInterval(carregarDados, 5000); // Atualiza o status automaticamente
     </script>
 </body>
 </html>
